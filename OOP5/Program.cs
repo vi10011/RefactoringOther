@@ -5,19 +5,19 @@ using System.Text;
 class Worker
 {
     protected string Name;
-    protected string Year;
-    protected string Month;
+    protected int Year;
+    protected int Month;
     protected Company WorkPlace;
 
     public Worker()
     {
         Name = "";
-        Year = "";
-        Month = "";
+        Year = 0;
+        Month = 0;
         WorkPlace = new Company();
     }
 
-    public Worker(string name, string year, string month, Company company)
+    public Worker(string name, int year, int month, Company company)
     {
         Name = name;
         Year = year;
@@ -33,57 +33,24 @@ class Worker
         WorkPlace = new Company(other.WorkPlace);
     }
 
-    public void SetName(string name)
-    {
-        Name = name;
-    }
+    public void SetName(string name) => Name = name;
+    public void SetYear(int year) => Year = year;
+    public void SetMonth(int month) => Month = month;
+    public void SetWorkPlace(Company company) => WorkPlace = company;
 
-    public void SetYear(string year)
-    {
-        Year = year;
-    }
-
-    public void SetMonth(string month)
-    {
-        Month = month;
-    }
-
-    public void SetWorkPlace(Company company)
-    {
-        WorkPlace = company;
-    }
-
-    public string GetName()
-    {
-        return Name;
-    }
-
-    public string GetYear()
-    {
-        return Year;
-    }
-
-    public string GetMonth()
-    {
-        return Month;
-    }
-
-    public Company GetWorkPlace()
-    {
-        return WorkPlace;
-    }
+    public string GetName() => Name;
+    public int GetYear() => Year;
+    public int GetMonth() => Month;
+    public Company GetWorkPlace() => WorkPlace;
 
     public int GetWorkExperience()
     {
         DateTime currentDate = DateTime.Now;
-        int totalMonths = (currentDate.Year - Convert.ToInt32(Year)) * 12 + (currentDate.Month - Convert.ToInt32(Month));
+        int totalMonths = (currentDate.Year - Year) * 12 + (currentDate.Month - Month);
         return totalMonths;
     }
 
-    public double GetTotalMoney()
-    {
-        return WorkPlace.GetSalary() * GetWorkExperience();
-    }
+    public double GetTotalMoney() => WorkPlace.GetSalary() * GetWorkExperience();
 }
 
 class Company
@@ -113,35 +80,13 @@ class Company
         Salary = other.Salary;
     }
 
-    public void SetName(string name)
-    {
-        Name = name;
-    }
+    public void SetName(string name) => Name = name;
+    public void SetPosition(string position) => Position = position;
+    public void SetSalary(double salary) => Salary = salary;
 
-    public void SetPosition(string position)
-    {
-        Position = position;
-    }
-
-    public void SetSalary(double salary)
-    {
-        Salary = salary;
-    }
-
-    public string GetName()
-    {
-        return Name;
-    }
-
-    public string GetPosition()
-    {
-        return Position;
-    }
-
-    public double GetSalary()
-    {
-        return Salary;
-    }
+    public string GetName() => Name;
+    public string GetPosition() => Position;
+    public double GetSalary() => Salary;
 }
 
 class Program
@@ -155,9 +100,9 @@ class Program
             Console.Write("Прізвище та ініціали: ");
             string name = Console.ReadLine();
             Console.Write("Рік початку роботи: ");
-            string year = Console.ReadLine();
+            int year = Convert.ToInt32(Console.ReadLine());
             Console.Write("Місяць початку роботи: ");
-            string month = Console.ReadLine();
+            int month = Convert.ToInt32(Console.ReadLine());
             Console.Write("Назва компанії: ");
             string companyName = Console.ReadLine();
             Console.Write("Посада: ");
