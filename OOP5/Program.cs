@@ -76,25 +76,51 @@ class Program
     public static Worker[] ReadWorkersArray(int n)
     {
         Worker[] workers = new Worker[n];
+
         for (int i = 0; i < n; i++)
         {
-            Console.WriteLine("Введіть дані про працівника {0}:", i + 1);
+            Console.WriteLine($"Введіть дані про працівника {i + 1}:");
+
             Console.Write("Прізвище та ініціали: ");
             string name = Console.ReadLine();
-            Console.Write("Рік початку роботи: ");
-            int year = Convert.ToInt32(Console.ReadLine());
-            Console.Write("Місяць початку роботи: ");
-            int month = Convert.ToInt32(Console.ReadLine());
+
+            int year;
+            while (true)
+            {
+                Console.Write("Рік початку роботи: ");
+                if (int.TryParse(Console.ReadLine(), out year) && year > 1900 && year <= DateTime.Now.Year)
+                    break;
+                Console.WriteLine("Помилка! Введіть коректний рік (не раніше 1900 і не пізніше поточного року).");
+            }
+
+            int month;
+            while (true)
+            {
+                Console.Write("Місяць початку роботи: ");
+                if (int.TryParse(Console.ReadLine(), out month) && month >= 1 && month <= 12)
+                    break;
+                Console.WriteLine("Помилка! Введіть число від 1 до 12.");
+            }
+
             Console.Write("Назва компанії: ");
             string companyName = Console.ReadLine();
+
             Console.Write("Посада: ");
             string position = Console.ReadLine();
-            Console.Write("Зарплата: ");
-            double salary = Convert.ToDouble(Console.ReadLine());
+
+            double salary;
+            while (true)
+            {
+                Console.Write("Зарплата: ");
+                if (double.TryParse(Console.ReadLine(), out salary) && salary > 0)
+                    break;
+                Console.WriteLine("Помилка! Введіть позитивне число.");
+            }
 
             Company company = new Company(companyName, position, salary);
             workers[i] = new Worker(name, year, month, company);
         }
+
         return workers;
     }
 
@@ -139,7 +165,12 @@ class Program
         Console.InputEncoding = Encoding.Unicode;
 
         Console.Write("Введіть кількість працівників: ");
-        int n = Convert.ToInt32(Console.ReadLine());
+        int n;
+        while (!int.TryParse(Console.ReadLine(), out n) || n <= 0)
+        {
+            Console.WriteLine("Помилка! Введіть додатне число.");
+        }
+
         Worker[] workers = ReadWorkersArray(n);
 
         Console.WriteLine("\nІнформація про працівників:");
