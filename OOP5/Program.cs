@@ -9,12 +9,11 @@ class Worker
     public int Month { get; set; }
     public Company WorkPlace { get; set; }
 
+    private const int MinYear = 1900;
+
     public Worker()
     {
-        Name = "";
-        Year = 0;
-        Month = 0;
-        WorkPlace = new Company();
+        InitializeDefaults();
     }
 
     public Worker(string name, int year, int month, Company company)
@@ -33,6 +32,14 @@ class Worker
         WorkPlace = new Company(other.WorkPlace);
     }
 
+    private void InitializeDefaults()
+    {
+        Name = string.Empty;
+        Year = MinYear;
+        Month = 1;
+        WorkPlace = new Company();
+    }
+
     public int GetWorkExperience()
     {
         DateTime currentDate = DateTime.Now;
@@ -40,7 +47,14 @@ class Worker
         return totalMonths;
     }
 
-    public double GetTotalMoney() => WorkPlace.Salary * GetWorkExperience();
+    public double GetTotalMoney()
+    {
+        DateTime currentDate = DateTime.Now;
+        DateTime startDate = new DateTime(Year, Month, 1);
+        TimeSpan workDuration = currentDate - startDate;
+
+        return WorkPlace.Salary * workDuration.Days / 30;
+    }
 }
 
 class Company
@@ -51,8 +65,8 @@ class Company
 
     public Company()
     {
-        Name = "";
-        Position = "";
+        Name = string.Empty;
+        Position = string.Empty;
         Salary = 0.0;
     }
 
@@ -73,120 +87,39 @@ class Company
 
 class Program
 {
+    public static int GetValidYear() { /* ... */ }
+    public static int GetValidMonth() { /* ... */ }
+    public static double GetValidSalary() { /* ... */ }
+
     public static Worker[] ReadWorkersArray(int n)
     {
         Worker[] workers = new Worker[n];
-
         for (int i = 0; i < n; i++)
         {
             Console.WriteLine($"Введіть дані про працівника {i + 1}:");
 
-            Console.Write("Прізвище та ініціали: ");
             string name = Console.ReadLine();
-
-            int year;
-            while (true)
-            {
-                Console.Write("Рік початку роботи: ");
-                if (int.TryParse(Console.ReadLine(), out year) && year > 1900 && year <= DateTime.Now.Year)
-                    break;
-                Console.WriteLine("Помилка! Введіть коректний рік (не раніше 1900 і не пізніше поточного року).");
-            }
-
-            int month;
-            while (true)
-            {
-                Console.Write("Місяць початку роботи: ");
-                if (int.TryParse(Console.ReadLine(), out month) && month >= 1 && month <= 12)
-                    break;
-                Console.WriteLine("Помилка! Введіть число від 1 до 12.");
-            }
-
-            Console.Write("Назва компанії: ");
+            int year = GetValidYear();
+            int month = GetValidMonth();
             string companyName = Console.ReadLine();
-
-            Console.Write("Посада: ");
             string position = Console.ReadLine();
-
-            double salary;
-            while (true)
-            {
-                Console.Write("Зарплата: ");
-                if (double.TryParse(Console.ReadLine(), out salary) && salary > 0)
-                    break;
-                Console.WriteLine("Помилка! Введіть позитивне число.");
-            }
+            double salary = GetValidSalary();
 
             Company company = new Company(companyName, position, salary);
             workers[i] = new Worker(name, year, month, company);
         }
-
         return workers;
     }
 
-    public static void PrintWorker(Worker worker)
+    public static void SortAndPrintWorkersBy(Func<Worker, object> sortingCriterion)
     {
-        Console.WriteLine("Прізвище та ініціали: {0}", worker.Name);
-        Console.WriteLine("Стаж роботи: {0} місяців", worker.GetWorkExperience());
-        Console.WriteLine("Загальна сума зароблених коштів: {0}", worker.GetTotalMoney());
-        Console.WriteLine("Назва компанії: {0}", worker.WorkPlace.Name);
-        Console.WriteLine("Посада: {0}", worker.WorkPlace.Position);
-        Console.WriteLine("Зарплата: {0}", worker.WorkPlace.Salary);
-    }
-
-    public static void PrintWorkers(Worker[] workers)
-    {
-        foreach (var worker in workers)
-        {
-            PrintWorker(worker);
-            Console.WriteLine();
-        }
-    }
-
-    public static void GetWorkersInfo(Worker[] workers, out double maxSalary, out double minSalary)
-    {
-        maxSalary = workers.Max(w => w.WorkPlace.Salary);
-        minSalary = workers.Min(w => w.WorkPlace.Salary);
-    }
-
-    public static void SortWorkerBySalary(ref Worker[] workers)
-    {
-        Array.Sort(workers, (x, y) => y.WorkPlace.Salary.CompareTo(x.WorkPlace.Salary));
-    }
-
-    public static void SortWorkerByWorkExperience(ref Worker[] workers)
-    {
-        Array.Sort(workers, (x, y) => x.GetWorkExperience().CompareTo(y.GetWorkExperience()));
+        Array.Sort(workers, (x, y) => Comparer<object>.Default.Compare(sortingCriterion(x), sortingCriterion(y)));
+        PrintWorkers(workers);
     }
 
     static void Main(string[] args)
     {
-        Console.OutputEncoding = Encoding.Unicode;
-        Console.InputEncoding = Encoding.Unicode;
-
-        Console.Write("Введіть кількість працівників: ");
-        int n;
-        while (!int.TryParse(Console.ReadLine(), out n) || n <= 0)
-        {
-            Console.WriteLine("Помилка! Введіть додатне число.");
-        }
-
-        Worker[] workers = ReadWorkersArray(n);
-
-        Console.WriteLine("\nІнформація про працівників:");
-        PrintWorkers(workers);
-
-        double maxSalary, minSalary;
-        GetWorkersInfo(workers, out maxSalary, out minSalary);
-        Console.WriteLine("\nМаксимальна зарплата: {0}", maxSalary);
-        Console.WriteLine("Мінімальна зарплата: {0}", minSalary);
-
-        SortWorkerBySalary(ref workers);
-        Console.WriteLine("\nСортування працівників за зарплатою:");
-        PrintWorkers(workers);
-
-        SortWorkerByWorkExperience(ref workers);
-        Console.WriteLine("\nСортування працівників за стажем роботи:");
-        PrintWorkers(workers);
+        Worker[] workers = ReadWorkersArray(3); // Наприклад
+        SortAndPrintWorkersBy(w => w.GetWorkExperience());
     }
 }
