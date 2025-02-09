@@ -49,12 +49,9 @@ class Worker
 
     public double GetTotalMoney()
     {
-        DateTime currentDate = DateTime.Now;
-        DateTime startDate = new DateTime(Year, Month, 1);
-        TimeSpan workDuration = currentDate - startDate;
-
-        return WorkPlace.Salary * workDuration.Days / 30;
+        return WorkPlace.Salary * GetWorkExperience();
     }
+
 }
 
 class Company
